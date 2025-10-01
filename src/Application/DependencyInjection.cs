@@ -18,4 +18,14 @@ public static class DependencyInjection
 
         return services;
     }
+
+
+    /// <summary>
+    /// Add infrastructure health checks
+    /// </summary>
+    public static IHealthChecksBuilder AddApplicationChecks(this IHealthChecksBuilder builder)
+    {
+        return builder.AddCheck<FakePaymentService.HealthChecks.PaymentServiceHealthCheck>("external_payment_service");
+
+    }
 }

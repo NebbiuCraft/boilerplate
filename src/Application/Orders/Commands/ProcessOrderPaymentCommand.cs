@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Application.Common;
 using Application.Dtos;
-using Application.Services;
+using FakePaymentService;
 using Domain.Entities;
 using Domain.Exceptions;
 using Domain.Repositories;

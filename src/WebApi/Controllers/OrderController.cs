@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Application.Dtos;
 using Application.Orders.Commands;
 using Application.Orders.Queries;
-using Application.Services;
+using FakePaymentService;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

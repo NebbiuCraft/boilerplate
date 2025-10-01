@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Application.Services;
+namespace FakePaymentService;
 
 public enum PaymentStatus
 {

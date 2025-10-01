@@ -3,6 +3,7 @@ using System.Linq;
 using Application;
 using Infrastructure;
 using Infrastructure.Persistence;
+using FakePaymentService;
 using WebApi.Middleware;
 using WebApi.Configuration;
 using Microsoft.AspNetCore.Builder;
@@ -29,6 +30,14 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    // Add health checks
+    builder.Services.AddHealthChecks()
+        .AddInfrastructureHealthChecks()
+        .AddApplicationChecks();
+
+    // Register external services at composition root
+    builder.Services.AddPaymentServices();
 
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);

@@ -63,6 +63,14 @@
 -   **Exception Handling**: Global middleware provides structured exception logging
 -   **Configuration**: Logging configured via `appsettings.json` with environment-specific overrides
 
+### Health Checks & Monitoring
+
+-   **Clean Architecture**: Health checks in appropriate layers (Infrastructure for DB, Services for external services)
+-   **Comprehensive Endpoints**: `/api/Health` (detailed), `/api/Health/live` (liveness), `/api/Health/ready` (readiness)
+-   **Structured Logging**: Health check results logged with detailed context and timing
+-   **Container Ready**: Separate liveness/readiness probes for Kubernetes/Docker deployments
+-   **Extension Pattern**: Each layer provides health check registration extensions (`AddInfrastructureHealthChecks`, `AddPaymentServiceHealthChecks`)
+
 ### Exception Handling Strategy
 
 -   **Domain Exceptions**: Custom exceptions in `Domain/Exceptions/` (e.g., `InvalidOrderItemException`)
@@ -96,6 +104,9 @@
 -   `src/Domain/Events/*.cs`: Domain events for order/payment lifecycle
 -   `src/Application/Orders/EventHandlers/*.cs`: Domain event handlers with mock business logic
 -   `src/WebApi/Configuration/LoggingConfiguration.cs`: Serilog configuration and setup
+-   `src/Infrastructure/HealthChecks/DatabaseHealthCheck.cs`: Database health monitoring
+-   `src/Services/FakePaymentService/HealthChecks/PaymentServiceHealthCheck.cs`: Payment service health monitoring
+-   `src/WebApi/Controllers/HealthController.cs`: Health check API endpoints
 -   `package.json`: All EF Core and development commands
 
 ---

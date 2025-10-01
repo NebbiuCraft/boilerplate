@@ -1,6 +1,6 @@
 using AutoMapper;
 using Application.Dtos;
-using Application.Services;
+using FakePaymentService;
 using Domain.Entities;
 
 namespace Application.Mappings;
