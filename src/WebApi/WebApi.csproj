@@ -24,4 +24,12 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"
       Version="8.0.8" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="dotnet tool restore"
+          Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'"/>
+    <Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1"
+          Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'"/>
+  </Target>
+
 </Project>

@@ -69,6 +69,27 @@ public class OrderController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetOrders([FromQuery] GetOrdersQuery query)
+    {
+        _logger.LogInformation(
+            "Retrieving orders | Page: {Page} | PageSize: {PageSize} | SortBy: {SortBy} | CustomerEmail: {CustomerEmail}",
+            query.PageNumber,
+            query.PageSize,
+            query.SortBy,
+            query.CustomerEmail);
+
+        var result = await _mediator.Send(query);
+
+        _logger.LogInformation(
+            "Orders retrieved successfully | Total: {TotalCount} | Page: {Page} | Items: {ItemCount}",
+            result.TotalCount,
+            result.PageNumber,
+            result.Items.Count);
+
+        return Ok(result);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteOrder([FromRoute] int id)
     {

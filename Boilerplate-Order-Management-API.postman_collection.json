@@ -1,0 +1,692 @@
+{
+  "info": {
+    "name": "Boilerplate Order Management API",
+    "description": "Complete API collection for testing the Clean Architecture DDD Boilerplate Order Management system",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Get Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Health"
+              ]
+            },
+            "description": "Get comprehensive health status including database and external payment service health"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Liveness Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Health/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Health",
+                "live"
+              ]
+            },
+            "description": "Liveness probe for container orchestration"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Readiness Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Health",
+                "ready"
+              ]
+            },
+            "description": "Readiness probe for container orchestration"
+          },
+          "response": []
+        }
+      ],
+      "description": "Health check endpoints for monitoring application status"
+    },
+    {
+      "name": "Order Management",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('orderId', response.toString());",
+                  "    pm.test('Order created successfully', () => {",
+                  "        pm.expect(pm.response.code).to.equal(201);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"customer@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ]
+            },
+            "description": "Create a new order for a customer"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order (Test Domain Events)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"events.test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ]
+            },
+            "description": "Create an order to test domain events publishing"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{orderId}}"
+              ]
+            },
+            "description": "Retrieve an order by its ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"updated.customer@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{orderId}}"
+              ]
+            },
+            "description": "Update an existing order"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{orderId}}"
+              ]
+            },
+            "description": "Soft delete an order (sets Active = false)"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders - Basic",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ]
+            },
+            "description": "Get paginated list of orders with default pagination (page 1, size 10)"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders - With Pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order?pageNumber=1&pageSize=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ],
+              "query": [
+                {
+                  "key": "pageNumber",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get paginated list of orders with custom page size"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders - With Sorting",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order?sortBy=TotalAmount&sortOrder=desc&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "TotalAmount"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get orders sorted by total amount in descending order"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders - With Filtering",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order?customerEmail=customer&minTotal=50&maxTotal=500&sortBy=CustomerEmail",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ],
+              "query": [
+                {
+                  "key": "customerEmail",
+                  "value": "customer"
+                },
+                {
+                  "key": "minTotal",
+                  "value": "50"
+                },
+                {
+                  "key": "maxTotal",
+                  "value": "500"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "CustomerEmail"
+                }
+              ]
+            },
+            "description": "Get filtered orders by customer email and total amount range"
+          },
+          "response": []
+        },
+        {
+          "name": "List Orders - Full Example",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order?pageNumber=2&pageSize=3&sortBy=TotalAmount&sortOrder=desc&customerEmail=example&minTotal=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ],
+              "query": [
+                {
+                  "key": "pageNumber",
+                  "value": "2"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "3"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "TotalAmount"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                },
+                {
+                  "key": "customerEmail",
+                  "value": "example"
+                },
+                {
+                  "key": "minTotal",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Complete example with pagination, sorting, and filtering combined"
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD operations for order management"
+    },
+    {
+      "name": "Payment Processing",
+      "item": [
+        {
+          "name": "Process Payment - Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"amount\": 99.99,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{orderId}}/payment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{orderId}}",
+                "payment"
+              ]
+            },
+            "description": "Process a payment for an order (should succeed)"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Payment - Failure (Amount > 10000)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"amount\": 15000,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{orderId}}/payment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{orderId}}",
+                "payment"
+              ]
+            },
+            "description": "Process a payment that should fail due to amount exceeding limit"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Payment - Failure (Email with 'fail')",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Create an order with email containing 'fail' to test payment failure",
+                  "const createOrderRequest = {",
+                  "  url: pm.collectionVariables.get('baseUrl') + '/api/Order',",
+                  "  method: 'POST',",
+                  "  header: {",
+                  "    'Content-Type': 'application/json'",
+                  "  },",
+                  "  body: {",
+                  "    mode: 'raw',",
+                  "    raw: JSON.stringify({",
+                  "      customerEmail: 'fail.test@example.com'",
+                  "    })",
+                  "  }",
+                  "};",
+                  "",
+                  "pm.sendRequest(createOrderRequest, (err, response) => {",
+                  "  if (response.code === 201) {",
+                  "    pm.collectionVariables.set('failOrderId', response.text());",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{failOrderId}},\n  \"amount\": 50.00,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/{{failOrderId}}/payment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "{{failOrderId}}",
+                "payment"
+              ]
+            },
+            "description": "Process a payment that should fail due to email containing 'fail'"
+          },
+          "response": []
+        }
+      ],
+      "description": "Payment processing with success and failure scenarios"
+    },
+    {
+      "name": "Domain Events Testing",
+      "item": [
+        {
+          "name": "Complete Order Workflow",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// This workflow tests the complete domain events chain",
+                  "pm.test('Workflow step completed', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "// Check console logs for domain events",
+                  "console.log('Check application logs for domain events:');",
+                  "console.log('- OrderCreatedEvent');",
+                  "console.log('- PaymentInitiatedEvent');",
+                  "console.log('- PaymentSuccessfulEvent (if payment succeeds)');",
+                  "console.log('- PaymentFailedEvent (if payment fails)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"domain.events@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ]
+            },
+            "description": "Create order and watch console logs for domain events"
+          },
+          "response": []
+        }
+      ],
+      "description": "Test cases for domain events and event handlers"
+    },
+    {
+      "name": "Error Scenarios",
+      "item": [
+        {
+          "name": "Get Non-Existent Order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "99999"
+              ]
+            },
+            "description": "Test error handling for non-existent order"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Order Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerEmail\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order"
+              ]
+            },
+            "description": "Test validation with invalid data"
+          },
+          "response": []
+        },
+        {
+          "name": "Payment on Non-Existent Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 99999,\n  \"amount\": 100.00,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/Order/99999/payment",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Order",
+                "99999",
+                "payment"
+              ]
+            },
+            "description": "Test payment processing on non-existent order"
+          },
+          "response": []
+        }
+      ],
+      "description": "Error scenarios and exception handling tests"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Testing Boilerplate Order Management API');",
+          "console.log('Base URL: ' + pm.collectionVariables.get('baseUrl'));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Response time is reasonable', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has proper headers', () => {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});"
+        ]
+      }
+    }
+  ]
+}

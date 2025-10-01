@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Common;
@@ -40,5 +41,10 @@ public abstract class EfRepository<T> : IRepository<T> where T : class, IAggrega
     {
         entity.Active = false;
         return SaveAsync(cancellationToken);
+    }
+
+    public virtual IQueryable<T> GetQueryable()
+    {
+        return _db.Set<T>().Where(x => x.Active);
     }
 }
