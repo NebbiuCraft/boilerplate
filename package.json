@@ -1,0 +1,18 @@
+{
+  "name": "boilerplate-order-management",
+  "version": "1.0.0",
+  "description": "Order Management System - Clean Architecture with DDD",
+  "scripts": {
+    "build": "dotnet build",
+    "run": "dotnet run --project src/WebApi",
+    "run:watch": "dotnet watch --project src/WebApi",
+    "ef:add-migration": "dotnet ef migrations add",
+    "ef:update-db": "dotnet ef database update --project src/Infrastructure --startup-project src/WebApi",
+    "ef:reset-db": "dotnet ef database drop --project src/Infrastructure --startup-project src/WebApi --force && dotnet ef database update --project src/Infrastructure --startup-project src/WebApi",
+    "ef:list-migrations": "dotnet ef migrations list --project src/Infrastructure --startup-project src/WebApi",
+    "ef:remove-migration": "dotnet ef migrations remove --project src/Infrastructure --startup-project src/WebApi",
+    "ef:script-migration": "dotnet ef migrations script --project src/Infrastructure --startup-project src/WebApi"
+  },
+  "devDependencies": {},
+  "private": true
+}
