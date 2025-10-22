@@ -7,7 +7,7 @@ using Domain.Repositories;
 using MediatR;
 namespace Application.Orders.Commands;
 
-public record UpdateOrderCommand(int OrderId, UpdateOrderDto OrderDto) : IRequest<bool>;
+public record UpdateOrderCommand(int OrderId, string CustomerEmail, bool IsPaid) : IRequest<bool>;
 
 public class UpdateOrderHandler : IRequestHandler<UpdateOrderCommand, bool>
 {
@@ -26,8 +26,8 @@ public class UpdateOrderHandler : IRequestHandler<UpdateOrderCommand, bool>
         if (order == null) return false;
 
         // Update properties using reflection or create update methods in domain
-        order.GetType().GetProperty("CustomerEmail")?.SetValue(order, request.OrderDto.CustomerEmail);
-        if (request.OrderDto.IsPaid && !order.IsPaid) order.MarkPaid();
+        order.GetType().GetProperty("CustomerEmail")?.SetValue(order, request.CustomerEmail);
+        if (request.IsPaid && !order.IsPaid) order.MarkPaid();
         await _repo.SaveAsync(cancellationToken);
         return true;
     }

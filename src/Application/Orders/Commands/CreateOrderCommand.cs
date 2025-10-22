@@ -9,7 +9,7 @@ using Domain.Repositories;
 using MediatR;
 namespace Application.Orders.Commands;
 
-public record CreateOrderCommand(CreateOrderDto OrderDto) : IRequest<int>;
+public record CreateOrderCommand(string CustomerEmail) : IRequest<int>;
 
 public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, int>
 {
@@ -26,7 +26,8 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, int>
 
     public async Task<int> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        Order order = _mapper.Map<Order>(request.OrderDto);
+        Order order = new(request.CustomerEmail);
+
         await _repo.AddAsync(order, cancellationToken);
         await _repo.SaveAsync(cancellationToken);
 

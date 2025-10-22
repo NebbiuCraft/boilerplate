@@ -2,6 +2,7 @@ using AutoMapper;
 using Application.Dtos;
 using FakePaymentService;
 using Domain.Entities;
+using Application.Orders.Commands;
 
 namespace Application.Mappings;
 
@@ -12,10 +13,7 @@ public class OrderMappingProfile : Profile
     CreateMap<Order, OrderDto>();
     CreateMap<OrderItem, OrderItemDto>();
 
-    CreateMap<CreateOrderDto, Order>()
-        .ConstructUsing(dto => new Order(dto.CustomerEmail));
-
-    CreateMap<UpdateOrderDto, Order>()
+    CreateMap<UpdateOrderCommand, Order>()
         .ForMember(dest => dest.Id, opt => opt.Ignore())
         .ForMember(dest => dest.Items, opt => opt.Ignore());
 

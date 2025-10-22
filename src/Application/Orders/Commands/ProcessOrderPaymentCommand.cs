@@ -13,7 +13,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Orders.Commands;
 
-public record ProcessOrderPaymentCommand(ProcessPaymentDto PaymentDto) : IRequest<PaymentResultDto>;
+public record ProcessOrderPaymentCommand() : IRequest<PaymentResultDto>
+{
+  public int OrderId { get; set; }
+  public decimal Amount { get; set; }
+  public string Currency { get; set; } = "USD";
+  public string PaymentMethod { get; set; } = string.Empty;
+}
 
 public class ProcessOrderPaymentHandler : IRequestHandler<ProcessOrderPaymentCommand, PaymentResultDto>
 {
@@ -41,27 +47,27 @@ public class ProcessOrderPaymentHandler : IRequestHandler<ProcessOrderPaymentCom
   {
     _logger.LogInformation(
         "Processing payment for order {OrderId} | Amount: {RequestedAmount} {Currency} | Payment Method: {PaymentMethod}",
-        request.PaymentDto.OrderId,
-        request.PaymentDto.Amount,
-        request.PaymentDto.Currency,
-        request.PaymentDto.PaymentMethod);
+        request.OrderId,
+        request.Amount,
+        request.Currency,
+        request.PaymentMethod);
 
-    var order = await _orderRepository.GetByIdAsync(request.PaymentDto.OrderId, cancellationToken);
+    var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
     if (order == null)
     {
-      _logger.LogWarning("Payment processing failed - Order {OrderId} not found", request.PaymentDto.OrderId);
-      throw new OrderNotFoundException(request.PaymentDto.OrderId);
+      _logger.LogWarning("Payment processing failed - Order {OrderId} not found", request.OrderId);
+      throw new OrderNotFoundException(request.OrderId);
     }
 
     if (order.IsPaid)
     {
       _logger.LogWarning(
           "Duplicate payment attempt for order {OrderId} | Existing Transaction: {ExistingTransactionId} | Payment Date: {PaymentDate}",
-          request.PaymentDto.OrderId,
+          request.OrderId,
           order.TransactionId,
           order.PaymentDate);
 
-      throw new DuplicatePaymentException("Order is already paid", request.PaymentDto.OrderId)
+      throw new DuplicatePaymentException("Order is already paid", request.OrderId)
         .AddContext("ExistingTransactionId", order.TransactionId)
         .AddContext("PaymentDate", order.PaymentDate);
     }
@@ -74,26 +80,26 @@ public class ProcessOrderPaymentHandler : IRequestHandler<ProcessOrderPaymentCom
     }
 
     // Use provided amount or calculated total
-    var amountToProcess = request.PaymentDto.Amount > 0 ? request.PaymentDto.Amount : order.TotalAmount;
+    var amountToProcess = request.Amount > 0 ? request.Amount : order.TotalAmount;
 
     _logger.LogInformation(
         "Initiating payment processing | Order: {OrderId} | Customer: {CustomerEmail} | Final Amount: {FinalAmount} {Currency}",
         order.Id,
         order.CustomerEmail,
         amountToProcess,
-        request.PaymentDto.Currency);
+        request.Currency);
 
     // Raise payment initiation event
-    order.InitiatePayment(amountToProcess, request.PaymentDto.Currency, request.PaymentDto.PaymentMethod);
+    order.InitiatePayment(amountToProcess, request.Currency, request.PaymentMethod);
     await _domainEventPublisher.PublishEventsAsync(order);
 
     var paymentRequest = new PaymentRequest
     {
       Amount = amountToProcess,
-      Currency = request.PaymentDto.Currency,
+      Currency = request.Currency,
       CustomerEmail = order.CustomerEmail,
       OrderReference = $"ORDER_{order.Id}",
-      PaymentMethod = request.PaymentDto.PaymentMethod
+      PaymentMethod = request.PaymentMethod
     };
 
     var paymentResult = await _paymentService.ProcessPaymentAsync(paymentRequest, cancellationToken);
@@ -124,8 +130,8 @@ public class ProcessOrderPaymentHandler : IRequestHandler<ProcessOrderPaymentCom
           amountToProcess);
 
       // Record payment failure and publish events
-      order.RecordPaymentFailure(amountToProcess, request.PaymentDto.Currency,
-          request.PaymentDto.PaymentMethod, paymentResult.Message ?? "Payment processing failed");
+      order.RecordPaymentFailure(amountToProcess, request.Currency,
+          request.PaymentMethod, paymentResult.Message ?? "Payment processing failed");
       await _domainEventPublisher.PublishEventsAsync(order);
     }
 
