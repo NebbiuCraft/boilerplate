@@ -11,7 +11,8 @@
     "ef:reset-db": "dotnet ef database drop --project src/Infrastructure --startup-project src/WebApi --force && dotnet ef database update --project src/Infrastructure --startup-project src/WebApi",
     "ef:list-migrations": "dotnet ef migrations list --project src/Infrastructure --startup-project src/WebApi",
     "ef:remove-migration": "dotnet ef migrations remove --project src/Infrastructure --startup-project src/WebApi",
-    "ef:script-migration": "dotnet ef migrations script --project src/Infrastructure --startup-project src/WebApi"
+    "ef:script": "dotnet ef migrations script --project src/Infrastructure --startup-project src/WebApi --idempotent --output scripts/migrations/migration-script.sql",
+    "scaffold:legacy-db": "cd src/Infrastructure && node scaffold-legacy-db.js"
   },
   "devDependencies": {},
   "private": true
