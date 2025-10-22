@@ -29,7 +29,28 @@ try
     // Add services
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+        {
+            Title = "Boilerplate Order Management API",
+            Version = "v1",
+            Description = "A Clean Architecture implementation with DDD principles for order management",
+            Contact = new Microsoft.OpenApi.Models.OpenApiContact
+            {
+                Name = "API Support",
+                Email = "support@example.com"
+            }
+        });
+
+        // Enable annotations
+        options.EnableAnnotations();
+
+        // Include XML comments
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments(xmlPath);
+    });
 
     // Add health checks
     builder.Services.AddHealthChecks()

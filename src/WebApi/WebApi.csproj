@@ -13,6 +13,7 @@
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
@@ -27,9 +28,9 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="dotnet tool restore"
-          Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'"/>
+      Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'" />
     <Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1"
-          Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'"/>
+      Condition="'$(ASPNETCORE_ENVIRONMENT)' == 'Localhost'" />
   </Target>
 
 </Project>

@@ -1,8 +1,13 @@
 {
   "openapi": "3.0.4",
   "info": {
-    "title": "WebApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-    "version": "1.0"
+    "title": "Boilerplate Order Management API",
+    "description": "A Clean Architecture implementation with DDD principles for order management",
+    "contact": {
+      "name": "API Support",
+      "email": "support@example.com"
+    },
+    "version": "v1"
   },
   "paths": {
     "/api/Health": {
@@ -10,9 +15,25 @@
         "tags": [
           "Health"
         ],
+        "summary": "Get comprehensive health status of the application",
+        "description": "Returns comprehensive health information including database connectivity, external service status, and overall system health",
+        "operationId": "GetHealth",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Health status retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          },
+          "503": {
+            "description": "One or more health checks failed",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
           }
         }
       }
@@ -22,9 +43,17 @@
         "tags": [
           "Health"
         ],
+        "summary": "Simple liveness probe for container orchestration",
+        "description": "Simple endpoint to verify the application is running. Used by container orchestrators like Kubernetes for liveness probes",
+        "operationId": "GetLiveness",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Application is alive and responding",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
           }
         }
       }
@@ -34,9 +63,25 @@
         "tags": [
           "Health"
         ],
+        "summary": "Readiness probe for container orchestration",
+        "description": "Endpoint that checks if the application is ready to serve requests by verifying all dependencies are healthy. Used by container orchestrators for readiness probes",
+        "operationId": "GetReadiness",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Application is ready to serve requests",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          },
+          "503": {
+            "description": "Application is not ready (dependencies unavailable)",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
           }
         }
       }
@@ -44,9 +89,13 @@
     "/api/Order": {
       "post": {
         "tags": [
-          "Order"
+          "Orders"
         ],
+        "summary": "Create a new order",
+        "description": "Creates a new order for the specified customer email address",
+        "operationId": "CreateOrder",
         "requestBody": {
+          "description": "Order creation details",
           "content": {
             "application/json": {
               "schema": {
@@ -67,14 +116,35 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
       "get": {
         "tags": [
-          "Order"
+          "Orders"
         ],
+        "summary": "Get a paginated list of orders",
+        "description": "Retrieves a paginated list of orders with optional filtering by customer email and amount range, plus sorting capabilities",
+        "operationId": "GetOrders",
         "parameters": [
           {
             "name": "CustomerEmail",
@@ -151,7 +221,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Orders retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDtoPaginatedResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -159,12 +246,16 @@
     "/api/Order/{id}": {
       "get": {
         "tags": [
-          "Order"
+          "Orders"
         ],
+        "summary": "Get an order by ID",
+        "description": "Retrieves a specific order by its unique identifier",
+        "operationId": "GetOrderById",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The order ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -174,18 +265,39 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Order found and returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
       "put": {
         "tags": [
-          "Order"
+          "Orders"
         ],
+        "summary": "Update an existing order",
+        "description": "Updates an existing order with new details",
+        "operationId": "UpdateOrder",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The order ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -194,6 +306,7 @@
           }
         ],
         "requestBody": {
+          "description": "Updated order details",
           "content": {
             "application/json": {
               "schema": {
@@ -213,19 +326,43 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "Order updated successfully"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
         "tags": [
-          "Order"
+          "Orders"
         ],
+        "summary": "Delete an order (soft delete)",
+        "description": "Soft deletes an order (sets Active = false). The order is not physically removed from the database",
+        "operationId": "DeleteOrder",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The order ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -234,8 +371,18 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "Order deleted successfully"
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -243,12 +390,16 @@
     "/api/Order/{id}/payment": {
       "post": {
         "tags": [
-          "Order"
+          "Payments"
         ],
+        "summary": "Process payment for an order",
+        "description": "Processes payment for a specific order. Amounts over $10,000 will fail for demonstration purposes",
+        "operationId": "ProcessOrderPayment",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The order ID",
             "required": true,
             "schema": {
               "type": "integer",
@@ -257,6 +408,7 @@
           }
         ],
         "requestBody": {
+          "description": "Payment processing details",
           "content": {
             "application/json": {
               "schema": {
@@ -277,7 +429,34 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Payment processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Payment failed or invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -294,6 +473,162 @@
           }
         },
         "additionalProperties": false
+      },
+      "OrderDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customerEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "isPaid": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderDtoPaginatedResult": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderDto"
+            },
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "hasPrevious": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "hasNext": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "sortOrder": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrderItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "productName": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "transactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "processedAmount": {
+            "type": "number",
+            "format": "double"
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaymentStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
       },
       "ProcessPaymentDto": {
         "type": "object",
@@ -331,5 +666,15 @@
         "additionalProperties": false
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Application health monitoring and diagnostics"
+    },
+    {
+      "name": "Order",
+      "description": "Order management including CRUD operations and payment processing"
+    }
+  ]
 }

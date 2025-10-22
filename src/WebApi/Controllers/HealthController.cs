@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebApi.Controllers;
 
@@ -13,6 +15,8 @@ namespace WebApi.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
+[SwaggerTag("Application health monitoring and diagnostics")]
 public class HealthController : ControllerBase
 {
   private readonly HealthCheckService _healthCheckService;
@@ -27,7 +31,18 @@ public class HealthController : ControllerBase
   /// <summary>
   /// Get comprehensive health status of the application
   /// </summary>
+  /// <returns>Detailed health status including all registered health checks</returns>
+  /// <response code="200">Health status retrieved successfully</response>
+  /// <response code="503">One or more health checks failed</response>
   [HttpGet]
+  [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(object), StatusCodes.Status503ServiceUnavailable)]
+  [SwaggerOperation(
+      Summary = "Get application health status",
+      Description = "Returns comprehensive health information including database connectivity, external service status, and overall system health",
+      OperationId = "GetHealth",
+      Tags = new[] { "Health" }
+  )]
   public async Task<IActionResult> GetHealth()
   {
     _logger.LogDebug("Health check requested");
@@ -81,7 +96,16 @@ public class HealthController : ControllerBase
   /// <summary>
   /// Simple liveness probe for container orchestration
   /// </summary>
+  /// <returns>Basic liveness status</returns>
+  /// <response code="200">Application is alive and responding</response>
   [HttpGet("live")]
+  [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+  [SwaggerOperation(
+      Summary = "Liveness probe",
+      Description = "Simple endpoint to verify the application is running. Used by container orchestrators like Kubernetes for liveness probes",
+      OperationId = "GetLiveness",
+      Tags = new[] { "Health" }
+  )]
   public IActionResult GetLiveness()
   {
     _logger.LogDebug("Liveness probe requested");
@@ -97,7 +121,18 @@ public class HealthController : ControllerBase
   /// <summary>
   /// Readiness probe for container orchestration
   /// </summary>
+  /// <returns>Readiness status based on health checks</returns>
+  /// <response code="200">Application is ready to serve requests</response>
+  /// <response code="503">Application is not ready (dependencies unavailable)</response>
   [HttpGet("ready")]
+  [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(object), StatusCodes.Status503ServiceUnavailable)]
+  [SwaggerOperation(
+      Summary = "Readiness probe",
+      Description = "Endpoint that checks if the application is ready to serve requests by verifying all dependencies are healthy. Used by container orchestrators for readiness probes",
+      OperationId = "GetReadiness",
+      Tags = new[] { "Health" }
+  )]
   public async Task<IActionResult> GetReadiness()
   {
     _logger.LogDebug("Readiness probe requested");
